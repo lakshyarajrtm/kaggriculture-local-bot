@@ -2,6 +2,16 @@
 from game import *
 
 
+obj_types = {
+    'Wheat' : {'seed_cost': 10, 'market_price': 25, 'first_yeild_day': 2, 'max_yield_day': 4, 'max_yeild': 6, 'max_yeild_unfertilized': 4, 'action_cost': 1},
+    'Carrot' : {'seed_cost': 20, 'market_price': 35, 'first_yeild_day': 2, 'max_yield_day': 3, 'max_yeild': 4, 'max_yeild_unfertilized': 3, 'action_cost': 1},
+    'Tomato' : {'seed_cost': 50, 'market_price': 60, 'first_yeild_day': 8, 'max_yield_day': 11, 'max_yeild': 4, 'max_yeild_unfertilized': 4, 'action_cost': 1},
+    'Strawberry' : {'seed_cost': 100, 'market_price': 120, 'first_yeild_day': 10, 'max_yield_day': 16, 'max_yeild': 4, 'max_yeild_unfertilized': 4, 'action_cost': 1},
+    'Melon' : {'seed_cost': 80, 'market_price': 250, 'first_yeild_day': 10, 'max_yield_day': 10, 'max_yeild': 6, 'max_yeild_unfertilized': 6, 'action_cost': 1},
+
+}
+
+
 @dataclass(frozen=True)
 class Position:
     x: int
@@ -39,7 +49,7 @@ def generate_action(job_pos: Position, farmer_pos: Position,
 
 
 
-def calculate_cost(workers: list[Position], jobs: list[Position]) -> list[tuple[int, int]]:
+def assign_jobs(workers: list[Position], jobs: list[Position]) -> list[tuple[int, int]]:
 
     size = max(len(workers), len(jobs))
     if size == 0:
@@ -120,11 +130,29 @@ def calculate_cost(workers: list[Position], jobs: list[Position]) -> list[tuple[
     result.sort()
     return result
 
-def find_jobs(farm: list[list[str]]) -> list[tuple]:
+def can_harvest(crop: dict) -> bool:
+
+    pass
+
+def find_jobs(tiles: list[list[dict | str | None]]) -> list[tuple]:
+
     jobs: list[tuple] = []
-    for i, row in enumerate(farm):
+    for i, row in enumerate(tiles):
         for j, tile in enumerate(row):
             if tile is None:
-                jobs.append(Job(Position(i, j), Action.PLANT))
+                jobs.append(Job(Position(i, j), Action.PLANT.value()))
             if isinstance(tile, dict):
-                tile['']
+                if tile['kind'] == 'PLANT':
+                    if not tile['watered_today']:
+                        jobs.append(Job(Position(i, j), Action.WATER.value()))
+                    if can_harvest(tile):
+                        jobs.append(Job(Position(i, j), Action.HARVEST.value()))
+                if tile['kind'] == 'WEED':
+                    jobs.append(Job(Position(i, j), Action.DIG.value()))
+                
+
+    return jobs
+
+def schedule(obs: dict) -> dict:
+    pass
+
